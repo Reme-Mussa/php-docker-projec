@@ -1,0 +1,27 @@
+version: '3.8'
+
+services:
+  php:
+    image: php:8.0-apache
+    container_name: php-container
+    volumes:
+      - ./src:/var/www/html
+    ports:
+      - "80:80"
+    networks:
+      - app-network
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql-container
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: exampledb 
+    ports:
+      - "3306:3306"
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge

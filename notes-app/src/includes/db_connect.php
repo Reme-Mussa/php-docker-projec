@@ -1,5 +1,4 @@
 <?php
-// Database connection for notes-app
 function get_db_connection() {
     $host = 'db';
     $dbname = 'notes_db';

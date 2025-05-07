@@ -1,7 +1,26 @@
 <?php
-// filepath: c:\Users\ÄGARE\Desktop\php-docker-project\notes-app\src\pages\notes.php
+require_once __DIR__ . '/includes/db_connect.php';
 
-require_once __DIR__ . '/../includes/db_connect.php';
+// إنشاء الجداول إذا لم تكن موجودة
+try {
+    $pdo = get_db_connection();
+    $pdo->exec("CREATE TABLE IF NOT EXISTS users (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        username VARCHAR(50) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL
+    )");
+
+    $pdo->exec("CREATE TABLE IF NOT EXISTS notes (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(100) NOT NULL,
+        content TEXT NOT NULL,
+        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        user_id INT,
+        FOREIGN KEY (user_id) REFERENCES users(id)
+    )");
+} catch (PDOException $e) {
+    die("Database error: " . $e->getMessage());
+}
 
 // جلب جميع الملاحظات من قاعدة البيانات
 try {

@@ -52,4 +52,3 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 - Lösenord sparas krypterat.
 - Endast ägaren kan redigera eller ta bort sina anteckningar.
 - All data sparas i MySQL via Docker.
-

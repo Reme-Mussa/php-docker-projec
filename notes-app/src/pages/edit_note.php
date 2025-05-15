@@ -11,7 +11,7 @@ $pdo = get_db_connection();
 $message = '';
 $note_id = $_GET['id'] ?? null;
 
-// جلب بيانات الملاحظة
+// Hämta observerade data
 if ($note_id) {
     $stmt = $pdo->prepare("SELECT * FROM notes WHERE id = ? AND user_id = ?");
     $stmt->execute([$note_id, $_SESSION['user_id']]);
@@ -24,7 +24,7 @@ if ($note_id) {
     die("No note id.");
 }
 
-// عند إرسال النموذج
+//  När du skickar in formuläret 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $title = trim($_POST['title'] ?? '');
     $content = trim($_POST['content'] ?? '');

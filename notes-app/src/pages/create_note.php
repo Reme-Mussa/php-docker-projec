@@ -2,7 +2,7 @@
 require_once __DIR__ . '/../includes/db_connect.php';
 session_start();
 
-// إذا لم يكن المستخدم مسجل دخول، إعادة توجيه
+// om användaren inte är inloggad, omdirigera
 if (!isset($_SESSION['user_id'])) {
     header("Location: login.php");
     exit;

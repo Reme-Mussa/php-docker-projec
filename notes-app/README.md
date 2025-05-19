@@ -29,7 +29,7 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 
 4. Öppna webbläsaren och gå till:
     ```
-    http://localhost:8080/
+    http://localhost:8080/pages/notes.php
     ```
 
 ---
@@ -50,6 +50,12 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 - All användarinput valideras
 - CSRF-skydd implementerat
 - XSS-skydd implementerat
+
+---
+
+## Skärmdump
+
+![Notes App Screenshot](screenshot.png)
 
 ---
 

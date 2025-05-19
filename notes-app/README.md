@@ -8,6 +8,7 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 
 - Docker
 - Docker Compose
+- Git
 
 ---
 
@@ -24,7 +25,9 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
     docker compose up -d
     ```
 
-3. Öppna webbläsaren och gå till:
+3. Vänta några sekunder tills containrarna är igång
+
+4. Öppna webbläsaren och gå till:
     ```
     http://localhost:8080/
     ```
@@ -33,22 +36,38 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 
 ## Användning
 
-- **Registrera användare:** Via sidan Register.
-- **Logga in:** Via sidan Login.
-- **Skapa anteckning:** När du är inloggad, klicka på Add New Note.
-- **Redigera/Ta bort anteckning:** Endast dina egna anteckningar.
-- **Logga ut:** Via länken Logout.
+### För besökare:
+- Se lista över alla anteckningar (endast läsning)
+
+### För inloggade användare:
+- Se alla anteckningar
+- Skapa nya anteckningar
+- Redigera egna anteckningar
+- Ta bort egna anteckningar
+
+### Säkerhet:
+- Lösenord sparas krypterat med PHP password_hash()
+- All användarinput valideras
+- CSRF-skydd implementerat
+- XSS-skydd implementerat
 
 ---
 
-## Skärmdump
+## Teknisk information
 
-![screenshot](screenshot.png)
+- Backend: PHP med snake_case namngivning
+- Frontend: HTML, CSS, JavaScript med camelCase namngivning
+- Databas: MySQL 5.7
+- Container: Docker
 
 ---
 
-## Extra info
+## Utvecklare
 
-- Lösenord sparas krypterat.
-- Endast ägaren kan redigera eller ta bort sina anteckningar.
-- All data sparas i MySQL via Docker.
+Detta projekt är utvecklat som en del av PHP-kursen.
+
+---
+
+## Licens
+
+MIT License

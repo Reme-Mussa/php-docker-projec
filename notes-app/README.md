@@ -9,7 +9,6 @@ Ett enkelt anteckningsapp där användare kan registrera sig, logga in, skapa, r
 - [Säkerhet](#säkerhet)
 - [Teknisk information](#teknisk-information)
 - [Projektstruktur](#projektstruktur)
-- [Utveckling](#utveckling)
 
 ## Krav
 
@@ -43,8 +42,8 @@ För att köra detta projekt behöver du:
     ```
     http://localhost:8081
     ```
-    Användarnamn: root
-    Lösenord: notes_root_password
+    Användarnamn: notes_user
+    Lösenord: notes_password
 
 ## Användning
 
@@ -66,12 +65,11 @@ Applikationen implementerar flera säkerhetsåtgärder:
 
 ### Användarsäkerhet
 - Lösenord sparas krypterat med PHP password_hash()
-- Sessioner hanteras säkert med regenerering av ID
-- Säker cookie-hantering med HttpOnly och Secure flaggor
+- Sessioner hanteras säkert
+- Säker cookie-hantering
 
 ### Datasäkerhet
 - All användarinput valideras
-- CSRF-skydd implementerat
 - XSS-skydd med htmlspecialchars()
 - SQL-injection skydd med PDO prepared statements
 
@@ -83,16 +81,14 @@ Applikationen implementerar flera säkerhetsåtgärder:
 ## Teknisk information
 
 ### Backend
-- PHP 8.x
+- PHP 8.1
 - PDO för databasanslutning
 - Session-baserad autentisering
-- RESTful API-design
 
 ### Frontend
 - HTML5
 - CSS3
 - Responsiv design
-- Formulärvalidering
 
 ### Databas
 - MySQL 5.7
@@ -111,53 +107,46 @@ Applikationen implementerar flera säkerhetsåtgärder:
 notes-app/
 ├── src/
 │   ├── includes/
-│   │   └── db_connect.php
+│   │   ├── db_connect.php
+│   │   └── functions.php
+│   ├── add_note.php
+│   ├── change_password
+│   ├── delete_note.php
+│   ├──edit_note.php
 │   ├── index.php
 │   ├── login.php
-│   ├── register.php
-│   ├── notes.php
-│   ├── add_note.php
-│   ├── edit_note.php
-│   ├── delete_note.php
 │   ├── logout.php
-│   └── styles.css
-├── init.sql
+│   ├── notes.php
+│   ├── register.php
+│   ├── # styles.css
+├── composer.json
 ├── docker-compose.yml
 ├── Dockerfile
+├── init.sql
 └── README.md
 ```
 
-### Varför init.sql?
+### Databasstruktur
 
-Vi använder `init.sql` för att automatiskt skapa databasstrukturen när containern startar. Detta ger flera fördelar:
-1. Automatisk databasinitialisering vid första start
-2. Konsekvent databasstruktur mellan olika miljöer
-3. Enkel versionering av databasändringar
-4. Möjlighet att återskapa databasen från scratch vid behov
+Databasen består av två huvudtabeller:
 
-## Utveckling
+1. **users**
+   - id (INT, PRIMARY KEY, AUTO_INCREMENT)
+   - username (VARCHAR(255), UNIQUE)
+   - password (VARCHAR(255))
+   - created_at (TIMESTAMP)
 
-Detta projekt är utvecklat från grunden som en del av PHP-kursen. Här är de viktigaste delarna av utvecklingen:
+2. **notes**
+   - id (INT, PRIMARY KEY, AUTO_INCREMENT)
+   - user_id (INT, FOREIGN KEY)
+   - title (VARCHAR(255))
+   - content (TEXT)
+   - created_at (TIMESTAMP)
 
-### 1. Grundstruktur
-- Skapade grundläggande filstruktur
-- Implementerade Docker-konfiguration
-- Skapade databasstruktur med init.sql
-
-### 2. Användarhantering
-- Implementerade registrering och inloggning
-- Lade till lösenordskryptering
-- Skapade sessionshantering
-
-### 3. Anteckningshantering
-- Implementerade CRUD-funktionalitet
-- Lade till användarbehörigheter
-- Implementerade säkerhetsåtgärder
-
-### 4. Förbättringar
-- Optimerade databasstruktur
-- Förbättrade användargränssnitt
-- Lade till felhantering
+Relationer:
+- En användare kan ha flera anteckningar (1:N)
+- Varje anteckning tillhör en användare
+- ON DELETE CASCADE säkerställer att anteckningar tas bort när användaren tas bort
 
 ## Licens
 

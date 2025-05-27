@@ -12,6 +12,8 @@ services:
       - ./src:/var/www/html
     depends_on:
       - db
+    networks:
+      - notes_network
 
   db:
     image: mysql:5.7
@@ -27,6 +29,8 @@ services:
     volumes:
       - ./init.sql:/docker-entrypoint-initdb.d/init.sql
       - notes_db_data:/var/lib/mysql
+    networks:
+      - notes_network
 
   phpmyadmin:
     image: phpmyadmin/phpmyadmin
@@ -37,8 +41,18 @@ services:
     environment:
       PMA_HOST: db
       MYSQL_ROOT_PASSWORD: notes_root_password
+      PMA_USER: notes_user
+      PMA_PASSWORD: notes_password
+      UPLOAD_LIMIT: 300M
+      MEMORY_LIMIT: 256M
     depends_on:
       - db
+    networks:
+      - notes_network
+
+networks:
+  notes_network:
+    driver: bridge
 
 volumes:
   notes_db_data:

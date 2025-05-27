@@ -2,134 +2,119 @@
 require_once __DIR__ . '/includes/db_connect.php';
 session_start();
 
+// Get statistics
 try {
     $pdo = get_db_connection();
-
-    $pdo->exec("
-        CREATE TABLE IF NOT EXISTS users (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(50) UNIQUE NOT NULL,
-            password VARCHAR(255) NOT NULL
-        );
-        CREATE TABLE IF NOT EXISTS notes (
-            id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(100) NOT NULL,
-            content TEXT NOT NULL,
-            created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
-            user_id INT,
-            FOREIGN KEY (user_id) REFERENCES users(id)
-        );
-    ");
-
-    $stmt = $pdo->query("
-        SELECT notes.id, notes.title, notes.content, notes.created_at, users.username 
-        FROM notes 
-        JOIN users ON notes.user_id = users.id
-        ORDER BY notes.created_at DESC
-    ");
-    $notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-
+    
+    // Get total notes count
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM notes");
+    $total_notes = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    
+    // Get total users count
+    $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
+    $total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
+    
+    // Get latest notes
+    $stmt = $pdo->query("SELECT n.title, n.created_at, u.username 
+                        FROM notes n 
+                        JOIN users u ON n.user_id = u.id 
+                        ORDER BY n.created_at DESC 
+                        LIMIT 5");
+    $latest_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+    error_log("Database error: " . $e->getMessage());
+    $total_notes = 0;
+    $total_users = 0;
+    $latest_notes = [];
 }
 ?>
+
 <!DOCTYPE html>
-<html lang="en">
+<html lang="sv">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Notes List</title>
-    <link rel="stylesheet" href="../styles.css" />
-    <style>
-        body {
-            background-image: url('https://www.transparenttextures.com/patterns/gray-floral.png');
-            background-repeat: repeat;
-        }
-        .note-card {
-            display: flex;
-            gap: 1rem;
-            align-items: flex-start;
-            background: linear-gradient(to bottom right, #ffffff, #eef3f7);
-            border: 1px solid #ddd;
-            padding: 16px;
-            border-radius: 10px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
-        }
-        .note-image {
-            width: 100px;
-            height: 100px;
-            object-fit: cover;
-            border-radius: 6px;
-        }
-        .note-content {
-            flex: 1;
-        }
-        .note-content h2 {
-            margin-top: 0;
-            color: #34495e;
-        }
-        .note-content p {
-            color: #555;
-            margin: 8px 0;
-        }
-        .note-content small {
-            color: #888;
-            display: block;
-            margin-top: 10px;
-        }
-        @media (max-width: 768px) {
-            .note-card {
-                flex-direction: column;
-                align-items: center;
-                text-align: center;
-            }
-            .note-image {
-                margin-bottom: 12px;
-            }
-        }
-        a.btn {
-            display: inline-block;
-            padding: 10px 16px;
-            background-color: #3498db;
-            color: white;
-            border-radius: 6px;
-            text-decoration: none;
-            transition: background-color 0.3s;
-        }
-        a.btn:hover {
-            background-color: #2980b9;
-        }
-        .text-center {
-            text-align: center;
-        }
-        .mt-2 {
-            margin-top: 1rem;
-        }
-    </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Välkommen till Notes App</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <h1 class="text-center">All Notes</h1>
-        <div class="text-center mt-2">
-            <a href="../index.php" class="btn">Home</a>
-        </div>
-        <div class="notes-list mt-2">
-            <?php if ($notes): ?>
-                <?php foreach ($notes as $note): ?>
-                    <div class="note-card">
-                        <img src="https://picsum.photos/seed/<?= $note['id'] ?>/100" alt="Note image" class="note-image" />
-                        <div class="note-content">
-                            <h2><?= htmlspecialchars($note['title']) ?></h2>
-                            <p><?= nl2br(htmlspecialchars($note['content'])) ?></p>
-                            <small>By: <?= htmlspecialchars($note['username']) ?> | <?= htmlspecialchars($note['created_at']) ?></small>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+        <header class="main-header">
+            <h1>Välkommen till Notes App</h1>
+            <p class="subtitle">En enkel och säker applikation för att hantera dina anteckningar</p>
+        </header>
+
+        <nav class="main-nav">
+            <?php if (isset($_SESSION['user_id'])): ?>
+                <p class="welcome-message">Välkommen, <?= htmlspecialchars($_SESSION['username']) ?>!</p>
+                <div class="nav-buttons">
+                    <a href="notes.php" class="btn">Visa alla anteckningar</a>
+                    <a href="add_note.php" class="btn">Skapa ny anteckning</a>
+                    <a href="logout.php" class="btn">Logga ut</a>
+                </div>
             <?php else: ?>
-                <p class="text-center">No notes found.</p>
+                <div class="nav-buttons">
+                    <a href="notes.php" class="btn">Visa alla anteckningar</a>
+                    <a href="login.php" class="btn">Logga in</a>
+                    <a href="register.php" class="btn">Registrera</a>
+                </div>
             <?php endif; ?>
-        </div>
+        </nav>
+
+        <main class="main-content">
+            <section class="statistics">
+                <h2>Statistik</h2>
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <h3>Anteckningar</h3>
+                        <p class="stat-number"><?= $total_notes ?></p>
+                    </div>
+                    <div class="stat-box">
+                        <h3>Användare</h3>
+                        <p class="stat-number"><?= $total_users ?></p>
+                    </div>
+                </div>
+            </section>
+
+            <?php if (!empty($latest_notes)): ?>
+            <section class="latest-notes">
+                <h2>Senaste anteckningarna</h2>
+                <div class="notes-grid">
+                    <?php foreach ($latest_notes as $note): ?>
+                        <div class="note-card">
+                            <h3><?= htmlspecialchars($note['title']) ?></h3>
+                            <p class="note-meta">
+                                Av: <?= htmlspecialchars($note['username']) ?><br>
+                                <?= date('Y-m-d H:i', strtotime($note['created_at'])) ?>
+                            </p>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            </section>
+            <?php endif; ?>
+
+            <section class="features">
+                <h2>Funktioner</h2>
+                <div class="features-grid">
+                    <div class="feature-box">
+                        <h3>Skapa anteckningar</h3>
+                        <p>Skapa och hantera dina anteckningar enkelt och säkert.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Säker åtkomst</h3>
+                        <p>Endast du kan redigera och ta bort dina egna anteckningar.</p>
+                    </div>
+                    <div class="feature-box">
+                        <h3>Enkel användning</h3>
+                        <p>Intuitivt gränssnitt för enkel hantering av anteckningar.</p>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="main-footer">
+            <p>&copy; <?= date('Y') ?> Notes App. Alla rättigheter förbehållna.</p>
+        </footer>
     </div>
 </body>
 </html>

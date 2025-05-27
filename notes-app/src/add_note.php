@@ -1,27 +1,43 @@
 <?php
-require_once __DIR__ . '/../includes/db_connect.php';
+require_once __DIR__ . '/includes/db_connect.php';
 session_start();
+
+// Check if user is logged in
+if (!isset($_SESSION['user_id'])) {
+    header("Location: login.php");
+    exit;
+}
 
 try {
     $pdo = get_db_connection();
 
     // Handle form submission
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-        $title = $_POST['title'] ?? '';
-        $content = $_POST['content'] ?? '';
-        $user_id = 1; // Replace with actual logged-in user ID in real case
+        $title = trim($_POST['title'] ?? '');
+        $content = trim($_POST['content'] ?? '');
+        $user_id = $_SESSION['user_id'];
 
         if (!empty($title) && !empty($content)) {
-            $stmt = $pdo->prepare("INSERT INTO notes (title, content, user_id) VALUES (?, ?, ?)");
-            $stmt->execute([$title, $content, $user_id]);
-            header("Location: notes.php");
-            exit;
+            // Insert new note with named parameters
+            $stmt = $pdo->prepare("INSERT INTO notes (title, content, user_id) VALUES (:title, :content, :user_id)");
+            $stmt->bindParam(':title', $title, PDO::PARAM_STR);
+            $stmt->bindParam(':content', $content, PDO::PARAM_STR);
+            $stmt->bindParam(':user_id', $user_id, PDO::PARAM_INT);
+            
+            if ($stmt->execute()) {
+                header("Location: notes.php");
+                exit;
+            } else {
+                $error = "Failed to create note. Please try again.";
+            }
         } else {
             $error = "Please fill in all fields.";
         }
     }
 } catch (PDOException $e) {
-    die("Database error: " . $e->getMessage());
+    $error = "An error occurred. Please try again later.";
+    // Log the error for debugging
+    error_log("Add note error: " . $e->getMessage());
 }
 ?>
 

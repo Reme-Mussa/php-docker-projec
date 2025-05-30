@@ -107,18 +107,17 @@ Applikationen implementerar flera säkerhetsåtgärder:
 notes-app/
 ├── src/
 │   ├── includes/
-│   │   ├── db_connect.php
-│   │   └── functions.php
+│   │   └── db_connect.php
 │   ├── add_note.php
-│   ├── change_password
+│   ├── change_password.php
 │   ├── delete_note.php
-│   ├──edit_note.php
+│   ├── edit_note.php
 │   ├── index.php
 │   ├── login.php
 │   ├── logout.php
 │   ├── notes.php
 │   ├── register.php
-│   ├── # styles.css
+│   └── styles.css
 ├── composer.json
 ├── docker-compose.yml
 ├── Dockerfile
@@ -151,3 +150,4 @@ Relationer:
 ## Licens
 
 MIT License
+Reme

@@ -48,16 +48,28 @@ För att köra detta projekt behöver du:
 ## Användning
 
 ### För besökare:
-- Se lista över alla anteckningar (endast läsning)
-- Registrera nytt konto
-- Logga in med befintligt konto
+- Bläddra bland alla anteckningar (endast läsning)
+- Skapa ett nytt konto
+- Logga in med ditt konto
 
 ### För inloggade användare:
-- Se alla anteckningar
-- Skapa nya anteckningar
-- Redigera egna anteckningar
-- Ta bort egna anteckningar
-- Logga ut
+- Hantera dina anteckningar enkelt
+- Skapa nya anteckningar med titel och innehåll
+- Redigera dina befintliga anteckningar
+- Ta bort anteckningar du inte längre behöver
+- Ändra ditt lösenord
+- Logga ut när du är klar
+
+### Funktioner
+
+#### Skapa anteckningar
+Skriv och spara dina tankar - snabbt och tryggt.
+
+#### Säker åtkomst
+Bara du har tillgång till dina anteckningar - full kontroll, alltid.
+
+#### Enkel användning
+Enkelt och smidigt att komma igång - inga krångligheter.
 
 ## Säkerhet
 
@@ -147,7 +159,11 @@ Relationer:
 - Varje anteckning tillhör en användare
 - ON DELETE CASCADE säkerställer att anteckningar tas bort när användaren tas bort
 
+## Projektinformation
+Utvecklad av: Reme
+Version: 1.0
+Senast uppdaterad: 2025
+
 ## Licens
 
 MIT License
-Reme

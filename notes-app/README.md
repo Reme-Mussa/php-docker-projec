@@ -73,4 +73,6 @@ notes-app/
 - Lösenord sparas inte i klartext, de "hashas" med en funktion i PHP.
 - Försöker förhindra att någon kan skicka in skadlig kod via formulär (SQL-injection och XSS) genom att rensa input och använda säkra metoder för databasen.
 
+Jag lär mig fortfarande och det här projektet hjälpte mig att förstå mer om hur PHP, Docker och databaser fungerar tillsammans.
+
 Jag har försökt förklara projektet så tydligt jag kunde, och hoppas det är lätt att följa.

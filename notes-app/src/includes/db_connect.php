@@ -1,15 +1,11 @@
 <?php
 try {
     $pdo = new PDO(
-        "mysql:host=db;dbname=notes_db;charset=utf8mb4",
+        "mysql:host=db;dbname=notes_db",
         "notes_user",
-        "notes_password",
-        [
-            PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION,
-            PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC,
-            PDO::ATTR_EMULATE_PREPARES => false
-        ]
+        "notes_password"
     );
-} catch (PDOException $e) {
-    die("Databasanslutning misslyckades: " . $e->getMessage());
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+} catch(PDOException $e) {
+    die("Kunde inte ansluta till databasen: " . $e->getMessage());
 }

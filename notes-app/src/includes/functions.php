@@ -89,15 +89,10 @@ function getMessage() {
 // التحقق من ملكية الملاحظة
 function is_note_owner($note_id) {
     global $pdo;
-    if (!is_logged_in()) {
-        return false;
-    }
-
     $stmt = $pdo->prepare("SELECT user_id FROM notes WHERE id = ?");
     $stmt->execute([$note_id]);
     $note = $stmt->fetch();
-
-    return $note && $note['user_id'] === $_SESSION['user_id'];
+    return $note && $note['user_id'] == $_SESSION['user_id'];
 }
 
 // التحقق من صحة كلمة المرور
@@ -110,21 +105,16 @@ function set_error($message) {
     $_SESSION['error'] = $message;
 }
 
-// عرض الرسائل
-function display_messages() {
-    $output = '';
-    
+// عرض رسائل الخطأ والنجاح
+function show_messages() {
     if (isset($_SESSION['error'])) {
-        $output .= '<div class="error-message">' . htmlspecialchars($_SESSION['error']) . '</div>';
+        echo '<div class="error-message">' . $_SESSION['error'] . '</div>';
         unset($_SESSION['error']);
     }
-    
     if (isset($_SESSION['success'])) {
-        $output .= '<div class="success-message">' . htmlspecialchars($_SESSION['success']) . '</div>';
+        echo '<div class="success-message">' . $_SESSION['success'] . '</div>';
         unset($_SESSION['success']);
     }
-    
-    return $output;
 }
 
 // تنسيق التاريخ

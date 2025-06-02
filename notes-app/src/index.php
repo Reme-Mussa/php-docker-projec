@@ -1,32 +1,18 @@
 <?php
-require_once __DIR__ . '/includes/db_connect.php';
 session_start();
+require_once 'includes/db_connect.php';
+require_once 'includes/functions.php';
 
-// Get statistics
-try {
-    $pdo = get_db_connection();
-    
-    // Get total notes count
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM notes");
-    $total_notes = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-    
-    // Get total users count
-    $stmt = $pdo->query("SELECT COUNT(*) as total FROM users");
-    $total_users = $stmt->fetch(PDO::FETCH_ASSOC)['total'];
-    
-    // Get latest notes
-    $stmt = $pdo->query("SELECT n.title, n.created_at, u.username 
-                        FROM notes n 
-                        JOIN users u ON n.user_id = u.id 
-                        ORDER BY n.created_at DESC 
-                        LIMIT 5");
-    $latest_notes = $stmt->fetchAll(PDO::FETCH_ASSOC);
-} catch (PDOException $e) {
-    error_log("Database error: " . $e->getMessage());
-    $total_notes = 0;
-    $total_users = 0;
-    $latest_notes = [];
+// التحقق من تسجيل الدخول
+if (!is_logged_in()) {
+    header('Location: login.php');
+    exit();
 }
+
+// جلب ملاحظات المستخدم
+$stmt = $pdo->prepare("SELECT * FROM notes WHERE user_id = ? ORDER BY created_at DESC");
+$stmt->execute([$_SESSION['user_id']]);
+$notes = $stmt->fetchAll();
 ?>
 
 <!DOCTYPE html>
@@ -34,87 +20,38 @@ try {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Välkommen till Notes App</title>
+    <title>Mina anteckningar</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
-        <header class="main-header">
-            <h1>Välkommen till Notes App</h1>
-            <p class="subtitle">En enkel och säker applikation för att hantera dina anteckningar</p>
+        <header>
+            <h1>Mina anteckningar</h1>
+            <nav>
+                <a href="logout.php" class="btn">Logga ut</a>
+            </nav>
         </header>
 
-        <nav class="main-nav">
-            <?php if (isset($_SESSION['user_id'])): ?>
-                <p class="welcome-message">Välkommen, <?= htmlspecialchars($_SESSION['username']) ?>!</p>
-                <div class="nav-buttons">
-                    <a href="notes.php" class="btn">Visa alla anteckningar</a>
-                    <a href="add_note.php" class="btn">Skapa ny anteckning</a>
-                    <a href="logout.php" class="btn">Logga ut</a>
-                </div>
+        <?php echo display_messages(); ?>
+
+        <div class="notes-grid">
+            <?php if (empty($notes)): ?>
+                <p class="no-notes">Du har inga anteckningar än.</p>
             <?php else: ?>
-                <div class="nav-buttons">
-                    <a href="notes.php" class="btn">Visa alla anteckningar</a>
-                    <a href="login.php" class="btn">Logga in</a>
-                    <a href="register.php" class="btn">Registrera</a>
-                </div>
-            <?php endif; ?>
-        </nav>
-
-        <main class="main-content">
-            <section class="statistics">
-                <h2>Statistik</h2>
-                <div class="stats-grid">
-                    <div class="stat-box">
-                        <h3>Anteckningar</h3>
-                        <p class="stat-number"><?= $total_notes ?></p>
-                    </div>
-                    <div class="stat-box">
-                        <h3>Användare</h3>
-                        <p class="stat-number"><?= $total_users ?></p>
-                    </div>
-                </div>
-            </section>
-
-            <?php if (!empty($latest_notes)): ?>
-            <section class="latest-notes">
-                <h2>Senaste anteckningarna</h2>
-                <div class="notes-grid">
-                    <?php foreach ($latest_notes as $note): ?>
-                        <div class="note-card">
-                            <h3><?= htmlspecialchars($note['title']) ?></h3>
-                            <p class="note-meta">
-                                Av: <?= htmlspecialchars($note['username']) ?><br>
-                                <?= date('Y-m-d H:i', strtotime($note['created_at'])) ?>
-                            </p>
+                <?php foreach ($notes as $note): ?>
+                    <div class="note-card">
+                        <h3><?php echo htmlspecialchars($note['title']); ?></h3>
+                        <p><?php echo nl2br(htmlspecialchars($note['content'])); ?></p>
+                        <div class="note-actions">
+                            <a href="edit.php?id=<?php echo $note['id']; ?>" class="btn btn-small">Redigera</a>
+                            <a href="delete.php?id=<?php echo $note['id']; ?>" class="btn btn-small btn-danger" onclick="return confirm('Är du säker på att du vill ta bort denna anteckning?')">Ta bort</a>
                         </div>
-                    <?php endforeach; ?>
-                </div>
-            </section>
+                    </div>
+                <?php endforeach; ?>
             <?php endif; ?>
+        </div>
 
-            <section class="features">
-                <h2>Funktioner</h2>
-                <div class="features-grid">
-                    <div class="feature-box">
-                        <h3>Skapa anteckningar</h3>
-                        <p>Skapa och hantera dina anteckningar enkelt och säkert.</p>
-                    </div>
-                    <div class="feature-box">
-                        <h3>Säker åtkomst</h3>
-                        <p>Endast du kan redigera och ta bort dina egna anteckningar.</p>
-                    </div>
-                    <div class="feature-box">
-                        <h3>Enkel användning</h3>
-                        <p>Intuitivt gränssnitt för enkel hantering av anteckningar.</p>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <footer class="main-footer">
-            <p>&copy; <?= date('Y') ?> Notes App. Alla rättigheter förbehållna.</p>
-        </footer>
+        <a href="create.php" class="btn">Lägg till ny anteckning</a>
     </div>
 </body>
-</html>
+</html> 

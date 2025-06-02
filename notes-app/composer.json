@@ -1,9 +1,9 @@
 {
-    "name": "notes-app/php",
-    "description": "A simple notes application built with PHP and MySQL",
+    "name": "notes-app/notes-app",
+    "description": "A simple notes application",
     "type": "project",
     "require": {
-        "php": ">=7.4",
+        "php": ">=8.0",
         "ext-pdo": "*",
         "ext-json": "*"
     },
